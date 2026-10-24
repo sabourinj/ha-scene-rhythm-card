@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html><head><meta charset="utf-8"><title>preview</title>
 <style>
   body { font-family: Roboto, sans-serif; background:#111318; padding:24px; max-width:520px;
@@ -8,7 +8,7 @@
   .stack > * { margin-bottom:8px; }
 </style></head>
 <body><div class="stack" id="s"></div>
-<script src="../ha-scene-rythm-card.js"></script>
+<script src="../ha-scene-rhythm-card.js"></script>
 <script>
   const opts = ['Night','Dawn','Morning','Midday','Sunset','Moonlight'];
   const stages = [
@@ -27,7 +27,7 @@
   const cfgs = [ { entity:'input_select.reef', name:'Reef', stages },
     { entity:'input_select.planted', name:'Planted', stages },
     { entity:'input_select.betta', name:'Betta' } ];
-  const cards = cfgs.map(c => { const el = document.createElement('scene-rythm-card'); el.setConfig(c); el.hass = hass; document.getElementById('s').appendChild(el); return el; });
+  const cards = cfgs.map(c => { const el = document.createElement('scene-rhythm-card'); el.setConfig(c); el.hass = hass; document.getElementById('s').appendChild(el); return el; });
 </script></body></html>
 
 

@@ -1,4 +1,4 @@
-# ha-scene-rythm-card
+# ha-scene-rhythm-card
 
 A thin Home Assistant Lovelace card that shows a scene schedule as a timeline across the day. Built for aquarium lights, but it works for any set of scenes that follow a daily rhythm.
 
@@ -27,13 +27,13 @@ Every change, whether scheduled or manual, goes through the same path, so the ca
 
 **HACS (custom repository):** HACS → ⋮ → Custom repositories → add this repo as type *Dashboard* → install.
 
-**Manual:** copy `ha-scene-rythm-card.js` to `/config/www/`, then go to Settings → Dashboards → ⋮ → Resources → Add:
-`/local/ha-scene-rythm-card.js` (JavaScript module).
+**Manual:** copy `ha-scene-rhythm-card.js` to `/config/www/`, then go to Settings → Dashboards → ⋮ → Resources → Add:
+`/local/ha-scene-rhythm-card.js` (JavaScript module).
 
 ## Config
 
 ```yaml
-type: custom:scene-rythm-card
+type: custom:scene-rhythm-card
 entity: input_select.reef_light_stage
 name: Reef
 stages:

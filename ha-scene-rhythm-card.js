@@ -1,5 +1,5 @@
 /**
- * Scene Rythm Card for Home Assistant
+ * Scene Rhythm Card for Home Assistant
  *
  * A thin, single-row card that shows the previous / current / next scene
  * stage (e.g. of an aquarium light) on a 24h timeline, with arrows to step
@@ -26,7 +26,7 @@ const fmtTime = (min) =>
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-class SceneRythmCard extends HTMLElement {
+class SceneRhythmCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -220,7 +220,7 @@ class SceneRythmCard extends HTMLElement {
   }
 
   _paint(body) {
-    this.shadowRoot.innerHTML = `<style>${SceneRythmCard.styles}</style><ha-card>${body}</ha-card>`;
+    this.shadowRoot.innerHTML = `<style>${SceneRhythmCard.styles}</style><ha-card>${body}</ha-card>`;
   }
 
   static get styles() {
@@ -283,14 +283,14 @@ class SceneRythmCard extends HTMLElement {
   }
 }
 
-if (!customElements.get('scene-rythm-card')) {
-  customElements.define('scene-rythm-card', SceneRythmCard);
+if (!customElements.get('scene-rhythm-card')) {
+  customElements.define('scene-rhythm-card', SceneRhythmCard);
   window.customCards = window.customCards || [];
   window.customCards.push({
-    type: 'scene-rythm-card',
-    name: 'Scene Rythm',
+    type: 'scene-rhythm-card',
+    name: 'Scene Rhythm',
     description: 'Thin day timeline of scene stages with prev/next arrows.',
     preview: true,
   });
-  console.info(`%c SCENE-RYTHM-CARD %c v${VERSION} `, 'background:#0ea5e9;color:#fff', '');
+  console.info(`%c SCENE-RHYTHM-CARD %c v${VERSION} `, 'background:#0ea5e9;color:#fff', '');
 }
