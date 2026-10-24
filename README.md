@@ -56,7 +56,7 @@ scenes:
 |---|---|---|
 | `entity` | **required** | `input_select` helper holding the current scene |
 | `name` | none | Small label shown before the current scene |
-| `scenes` | none | Per-option overrides: `option` (must match a helper option), plus optional `time` (`HH:MM`), `label` and `color`. The helper's options always decide which scenes exist and their order. If any scene has no time, segments are drawn at equal widths with no "now" tick. (`stages` is accepted as an older name.) |
+| `scenes` | none | Per-option overrides: `option` (must match a helper option), plus optional `time` (`HH:MM`), `label` and `color`. The helper's options always decide which scenes exist and their order. If any scene has no time, segments are drawn at equal widths with no "now" tick. |
 | `show_times` | `true` | Show start times beside the previous and next scenes |
 | `show_manual` | `true` | Show the MANUAL badge when the scene differs from the schedule |
 | `schedule_offset` | `0` | Minutes after each scene time that your automation actually fires, so the MANUAL badge doesn't flash during the gap |

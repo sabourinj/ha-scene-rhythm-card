@@ -23,12 +23,6 @@ const toMinutes = (t) => {
 };
 const fmtTime = (min) =>
   `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
-// `stages` was the original name for `scenes`; keep accepting it.
-const normalizeConfig = (config) => {
-  if (!config.stages) return config;
-  const { stages, ...rest } = config;
-  return { ...rest, scenes: rest.scenes || stages };
-};
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
@@ -49,7 +43,6 @@ class SceneRhythmCard extends HTMLElement {
     if (!config || !String(config.entity || '').startsWith('input_select.')) {
       throw new Error('Set `entity` to an input_select helper (e.g. input_select.reef_light_scene)');
     }
-    config = normalizeConfig(config);
     if (config.scenes && !Array.isArray(config.scenes)) {
       throw new Error('`scenes` must be a list');
     }
@@ -343,7 +336,7 @@ class SceneRhythmCardEditor extends HTMLElement {
   }
 
   setConfig(config) {
-    this._config = normalizeConfig({ ...config });
+    this._config = { ...config };
     this._update();
   }
 
