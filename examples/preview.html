@@ -1,0 +1,34 @@
+﻿<!doctype html>
+<html><head><meta charset="utf-8"><title>preview</title>
+<style>
+  body { font-family: Roboto, sans-serif; background:#111318; padding:24px; max-width:520px;
+    --primary-text-color:#e6e6e6; --secondary-text-color:#9aa0a6; --divider-color:#2c2f36;
+    --card-background-color:#1c1e24; --secondary-background-color:#2a2d34; }
+  ha-card { display:block; background:var(--card-background-color); border-radius:12px; }
+  .stack > * { margin-bottom:8px; }
+</style></head>
+<body><div class="stack" id="s"></div>
+<script src="../ha-scene-rythm-card.js"></script>
+<script>
+  const opts = ['Night','Dawn','Morning','Midday','Sunset','Moonlight'];
+  const stages = [
+    { option:'Dawn', time:'07:00', color:'#f59e0b' }, { option:'Morning', time:'09:00', color:'#fde047' },
+    { option:'Midday', time:'12:00', color:'#38bdf8' }, { option:'Sunset', time:'18:00', color:'#f97316' },
+    { option:'Moonlight', time:'20:30', color:'#6366f1' }, { option:'Night', time:'23:00', color:'#1e1b4b' } ];
+  const now = new Date(); const m = now.getHours()*60+now.getMinutes();
+  let sched = 'Night'; for (const s of stages) { const [h,mm]=s.time.split(':'); if (h*60+ +mm <= m) sched = s.option; }
+  const hass = { config:{}, states:{
+    'input_select.reef': { state: sched, attributes:{ options: opts } },
+    'input_select.planted': { state: 'Sunset', attributes:{ options: opts } },
+    'input_select.betta': { state: 'Midday', attributes:{ options: ['Off','Midday','Evening'] } } },
+    callService(d,s,data){ console.log('callService', d, s, JSON.stringify(data));
+      this.states = { ...this.states, [data.entity_id]: { ...this.states[data.entity_id], state: data.option } };
+      cards.forEach(c => c.hass = this); } };
+  const cfgs = [ { entity:'input_select.reef', name:'Reef', stages },
+    { entity:'input_select.planted', name:'Planted', stages },
+    { entity:'input_select.betta', name:'Betta' } ];
+  const cards = cfgs.map(c => { const el = document.createElement('scene-rythm-card'); el.setConfig(c); el.hass = hass; document.getElementById('s').appendChild(el); return el; });
+</script></body></html>
+
+
+
