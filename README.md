@@ -61,6 +61,6 @@ scenes:
 | `show_manual` | `true` | Show the MANUAL badge when the scene differs from the schedule |
 | `schedule_offset` | `0` | Minutes after each scene time that your automation actually fires, so the MANUAL badge doesn't flash during the gap |
 
-Stack one card per tank in a vertical stack. Each card is about 44 px tall.
+In a sections dashboard the card defaults to one row (56 px) at full width and can be resized from 1 to 4 rows; the bar, arrows and text grow with it. In masonry dashboards it is about 44 px tall.
 
 > Scene times are written in both the card config and the schedule automation. Keep them in sync.

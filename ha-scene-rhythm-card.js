@@ -9,12 +9,15 @@
  * that helper; an automation applies the matching scene whenever the helper
  * changes (see examples/aquarium_package.yaml).
  */
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 
 const PALETTE = ['#312e81', '#f59e0b', '#fde047', '#38bdf8', '#f97316', '#6366f1', '#14b8a6', '#ec4899'];
 const CHEVRON_LEFT = 'M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z';
 const CHEVRON_RIGHT = 'M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z';
 const DAY = 1440;
+const ROW_HEIGHT = 56; // one row in a sections-view grid
+const TEXT_WIDTH = 460; // card width at which 1x text comfortably fits all three labels
+const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 
 const toMinutes = (t) => {
   if (t == null) return null;
@@ -59,11 +62,28 @@ class SceneRhythmCard extends HTMLElement {
   connectedCallback() {
     // Keep the "now" marker and off-schedule badge fresh even without state changes.
     this._timer = setInterval(() => this._render(), 30000);
+    // Scale everything with the height the dashboard grid gives us (1 row = 56px).
+    // In masonry views the height follows the content, so the scale stays at 1.
+    // Text grows more gently and is capped by width so the three labels always fit.
+    this._resize = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      const scale = clamp(height / ROW_HEIGHT, 1, 4.5);
+      const text = clamp(Math.min(1 + (scale - 1) * 0.5, width / TEXT_WIDTH), 1, 2);
+      this._setVar('--srh-scale', scale);
+      this._setVar('--srh-text', text);
+    });
+    this._resize.observe(this);
     this._render();
   }
 
   disconnectedCallback() {
     clearInterval(this._timer);
+    this._resize?.disconnect();
+  }
+
+  _setVar(name, number) {
+    const value = number.toFixed(2);
+    if (this.style.getPropertyValue(name) !== value) this.style.setProperty(name, value);
   }
 
   getCardSize() {
@@ -71,7 +91,7 @@ class SceneRhythmCard extends HTMLElement {
   }
 
   getGridOptions() {
-    return { columns: 12, rows: 1, min_rows: 1 };
+    return { columns: 12, rows: 1, min_columns: 6, min_rows: 1, max_rows: 4 };
   }
 
   static getConfigElement() {
@@ -242,21 +262,31 @@ class SceneRhythmCard extends HTMLElement {
 
   static get styles() {
     return `
-      :host { display: block; }
-      ha-card { padding: 4px 2px; overflow: hidden; }
-      .row { display: flex; align-items: center; gap: 2px; }
+      /* Set from the card's size (see connectedCallback). --s: height, 1 = one 56px grid row.
+         --t: text and horizontal sizes, grows more gently and is capped by width. */
+      :host { display: block; height: 100%; --s: var(--srh-scale, 1); --t: var(--srh-text, 1); }
+      ha-card {
+        height: 100%; box-sizing: border-box; overflow: hidden;
+        display: flex; align-items: center;
+        padding: calc(4px * var(--s)) calc(2px * var(--t));
+      }
+      .row { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: calc(2px * var(--t)); }
       .nav {
-        flex: 0 0 auto; width: 32px; height: 36px; padding: 0;
+        flex: 0 0 auto; width: calc(32px * var(--t)); height: calc(36px * var(--s)); padding: 0;
         display: grid; place-items: center;
-        border: none; border-radius: 8px; background: none; cursor: pointer;
+        border: none; border-radius: calc(8px * var(--t)); background: none; cursor: pointer;
         color: var(--secondary-text-color);
       }
       .nav:hover { background: var(--secondary-background-color, rgba(127,127,127,.15)); color: var(--primary-text-color); }
-      .nav svg { width: 22px; height: 22px; fill: currentColor; }
-      .mid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 2px 0; }
+      .nav svg { width: calc(22px * var(--t)); height: calc(22px * var(--t)); fill: currentColor; }
+      .mid {
+        flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column;
+        gap: calc(5px * var(--s)); padding: calc(2px * var(--s)) 0;
+      }
       .labels {
         display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
-        align-items: center; gap: 8px; font-size: 12px; line-height: 16px;
+        align-items: center; gap: calc(8px * var(--t));
+        font-size: calc(12px * var(--t)); line-height: 1.33;
       }
       .side {
         min-width: 0; color: var(--secondary-text-color); cursor: pointer;
@@ -264,22 +294,22 @@ class SceneRhythmCard extends HTMLElement {
       }
       .side:hover { color: var(--primary-text-color); }
       .side.next { text-align: right; }
-      .t { opacity: .65; font-variant-numeric: tabular-nums; margin: 0 4px; }
+      .t { opacity: .65; font-variant-numeric: tabular-nums; margin: 0 .33em; }
       .cur {
-        display: flex; align-items: center; gap: 6px; white-space: nowrap;
-        font-size: 13px; font-weight: 600; color: var(--primary-text-color);
+        display: flex; align-items: center; gap: .5em; white-space: nowrap;
+        font-size: calc(13px * var(--t)); font-weight: 600; color: var(--primary-text-color);
       }
       .curlabel { cursor: pointer; }
       .name { font-weight: 400; color: var(--secondary-text-color); }
-      .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+      .dot { width: .6em; height: .6em; border-radius: 50%; flex: 0 0 auto; }
       .badge {
-        font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-        line-height: 14px; padding: 0 5px; border-radius: 7px; cursor: pointer;
+        font-size: .7em; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+        line-height: 1.55; padding: 0 .55em; border-radius: .8em; cursor: pointer;
         background: var(--warning-color, #f59e0b); color: #000;
       }
-      .bar { position: relative; height: 6px; }
+      .bar { position: relative; height: calc(6px * var(--s)); }
       .track {
-        position: absolute; inset: 0; border-radius: 3px; overflow: hidden;
+        position: absolute; inset: 0; border-radius: calc(3px * var(--s)); overflow: hidden;
         background: var(--divider-color, rgba(127,127,127,.2));
       }
       .seg {
@@ -290,7 +320,7 @@ class SceneRhythmCard extends HTMLElement {
       .seg:hover { opacity: .6; }
       .seg.cur { opacity: 1; }
       .now {
-        position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px;
+        position: absolute; top: calc(-3px * var(--s)); bottom: calc(-3px * var(--s)); width: 2px; margin-left: -1px;
         border-radius: 1px; pointer-events: none;
         background: var(--primary-text-color);
         box-shadow: 0 0 0 1px var(--ha-card-background, var(--card-background-color, #fff));
