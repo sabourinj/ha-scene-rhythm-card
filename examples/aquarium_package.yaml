@@ -1,15 +1,15 @@
 # Example package for ONE tank. Copy to /config/packages/reef_lights.yaml
 # and repeat (renaming "reef") for each tank.
 #
-# Idea: the input_select is the single source of truth for "current stage".
+# Idea: the input_select is the single source of truth for "current scene".
 #   - The schedule automation only SETS the helper.
 #   - The apply automation turns on the matching scene whenever the helper changes.
 #   - The card's arrows also just set the helper, so manual and scheduled changes
 #     go through the same path and the card always shows what's really applied.
 
 input_select:
-  reef_light_stage:
-    name: Reef light stage
+  reef_light_scene:
+    name: Reef light scene
     icon: mdi:fishbowl-outline
     options:
       - Night
@@ -35,17 +35,17 @@ automation:
     actions:
       - action: input_select.select_option
         target:
-          entity_id: input_select.reef_light_stage
+          entity_id: input_select.reef_light_scene
         data:
           option: "{{ trigger.id }}"
 
   # 2) Apply: helper changed (by schedule, card, or anything else) -> scene.
   - id: reef_light_apply
-    alias: Reef lights - apply stage
+    alias: Reef lights - apply scene
     mode: restart
     triggers:
       - trigger: state
-        entity_id: input_select.reef_light_stage
+        entity_id: input_select.reef_light_scene
         not_to: [unknown, unavailable]
       - trigger: homeassistant
         event: start
@@ -57,7 +57,7 @@ automation:
         Midday: scene.reef_midday
         Sunset: scene.reef_sunset
         Moonlight: scene.reef_moonlight
-      scene: "{{ scenes.get(states('input_select.reef_light_stage'), '') }}"
+      scene: "{{ scenes.get(states('input_select.reef_light_scene'), '') }}"
     conditions:
       - "{{ scene != '' }}"
     actions:
